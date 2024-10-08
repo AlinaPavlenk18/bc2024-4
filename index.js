@@ -24,7 +24,7 @@ const server = http.createServer((req, res) => {
     if (req.method === 'GET') {
         (async () => {
           try {
-            const image = await fs.readFile(filePath);
+            const image = await fs.promises.readFile(filePath,  { encoding: null });
             res.writeHead(200, { 'Content-Type': 'image/jpeg' });
             res.end(image);
           } catch (error) {
@@ -38,7 +38,7 @@ const server = http.createServer((req, res) => {
       req.on('end', async () => {
         const imageData = Buffer.concat(buffers);
         try {
-          await fs.writeFile(filePath, imageData);
+          await fs.promises.writeFile(filePath, imageData);
           res.writeHead(201, { 'Content-Type': 'text/plain' });
           res.end('Файл збережено');
         } catch (error) {
@@ -49,7 +49,7 @@ const server = http.createServer((req, res) => {
     } else if (req.method === 'DELETE') {
         (async () => {
           try {
-            await fs.unlink(filePath);
+            await fs.promises.unlink(filePath);
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('Файл видалено');
           } catch (error) {
