@@ -32,7 +32,21 @@ const filePath = path.join(cache, `${fileCode}.jpg`);
             res.writeHead(404, { 'Content-Type': 'text/plain' });
             res.end('Файл не знайдено');
           }
-        })();}
+        })();
+    }else if (req.method === 'PUT') {
+        const buffers = [];
+        req.on('data', chunk => buffers.push(chunk));
+        req.on('end', async () => {
+          const imageData = Buffer.concat(buffers);
+          try {
+            await fs.writeFile(filePath, imageData);
+            res.writeHead(201, { 'Content-Type': 'text/plain' });
+            res.end('Файл збережено');
+          } catch (error) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Помилка при збереженні файлу');
+          }
+        });}
 
 
 server.listen(port, host, () => {
