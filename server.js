@@ -17,23 +17,22 @@ if (!host || !port || !cache) {
 }
 
 const server = http.createServer((req, res) => {
-  res.end('Веб-сервер працює');
-});
-const fileCode = req.url.slice(1); 
-const filePath = path.join(cache, `${fileCode}.jpg`);
-  
-    if (req.method === 'GET') {
-        (async () => {
-          try {
-            const image = await fs.readFile(filePath);
-            res.writeHead(200, { 'Content-Type': 'image/jpeg' });
-            res.end(image);
-          } catch (error) {
-            res.writeHead(404, { 'Content-Type': 'text/plain' });
-            res.end('Файл не знайдено');
-          }
-        })();
-    }else if (req.method === 'PUT') {
+    res.end('Веб-сервер працює');
+      const fileCode = req.url.slice(1); 
+      const filePath = path.join(cache, `${fileCode}.jpg`);
+    
+      if (req.method === 'GET') {
+          (async () => {
+            try {
+              const image = await fs.readFile(filePath);
+              res.writeHead(200, { 'Content-Type': 'image/jpeg' });
+              res.end(image);
+            } catch (error) {
+              res.writeHead(404, { 'Content-Type': 'text/plain' });
+              res.end('Файл не знайдено');
+            }
+          })();
+      } else if (req.method === 'PUT') {
         const buffers = [];
         req.on('data', chunk => buffers.push(chunk));
         req.on('end', async () => {
@@ -46,7 +45,25 @@ const filePath = path.join(cache, `${fileCode}.jpg`);
             res.writeHead(500, { 'Content-Type': 'text/plain' });
             res.end('Помилка при збереженні файлу');
           }
-        });}
+        });
+      } else if (req.method === 'DELETE') {
+          (async () => {
+            try {
+              await fs.unlink(filePath);
+              res.writeHead(200, { 'Content-Type': 'text/plain' });
+              res.end('Файл видалено');
+            } catch (error) {
+              res.writeHead(404, { 'Content-Type': 'text/plain' });
+              res.end('Файл не знайдено');
+            }
+          })();
+      } else {
+        res.writeHead(405, { 'Content-Type': 'text/plain' });
+        res.end('Метод не дозволено');
+      }
+  });
+  
+  
 
 
 server.listen(port, host, () => {
